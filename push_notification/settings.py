@@ -28,14 +28,14 @@ env.read_env('.env')
 SECRET_KEY = env.str("SECRET_KEY", 'randomstring')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=True)
-
+ALLOWED_HOST=["*"]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
-
+AUTH_USER_MODEL = "account.User"
 
 # Application definition
 
@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'celery',
     'django_celery_beat',
     'account',
+    'notification',
+    'push_notifications',
 ]
 
 MIDDLEWARE = [
@@ -95,7 +97,7 @@ DATABASES = {
     }
 }
 
-
+SECURE_SSL_REDIRECT=False
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
@@ -136,3 +138,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# celery configuration
+CELERY_BROKER_URL = env.str("REDIS_URL", 'redis://localhost:6379')
+CELERY_RESULT_BACKEND = env.str("REDIS_URL", 'redis://localhost:6379')

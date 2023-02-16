@@ -9,6 +9,7 @@ class User(AbstractUser):
     last_login = None
     first_name = None
     last_name = None
+    is_notification_on = models.BooleanField(default=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
