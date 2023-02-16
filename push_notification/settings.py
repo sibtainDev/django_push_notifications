@@ -17,7 +17,6 @@ from environ import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 env = environ.Env()
 env.read_env('.env')
 # Quick-start development settings - unsuitable for production
@@ -28,7 +27,7 @@ env.read_env('.env')
 SECRET_KEY = env.str("SECRET_KEY", 'randomstring')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=True)
-ALLOWED_HOST=["*"]
+ALLOWED_HOST = ["*"]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
@@ -86,7 +85,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'push_notification.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -97,7 +95,7 @@ DATABASES = {
     }
 }
 
-SECURE_SSL_REDIRECT=False
+SECURE_SSL_REDIRECT = False
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
@@ -116,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -127,7 +124,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -142,3 +138,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # celery configuration
 CELERY_BROKER_URL = env.str("REDIS_URL", 'redis://localhost:6379')
 CELERY_RESULT_BACKEND = env.str("REDIS_URL", 'redis://localhost:6379')
+
+# push notification settings
+APNS_AUTH_KEY_PATH = BASE_DIR + '/' + 'push_notification' + env.str("AUTH_KEY_NAME", "")
+
+PUSH_NOTIFICATIONS_SETTINGS = {
+    "FCM_API_KEY": env.str("FCM_SERVER_KEY", ""),
+    "APNS_AUTH_KEY_PATH": APNS_AUTH_KEY_PATH,
+    "APNS_AUTH_KEY_ID": env.str("APNS_AUTH_KEY_ID", ""),
+    "APNS_TEAM_ID": env.str("APNS_TEAM_ID", ""),
+    "APNS_TOPIC": env.str("APNS_TOPIC", ""),
+    "APNS_USE_SANDBOX": env.bool("APNS_USE_SANDBOX", default=False),
+    "UPDATE_ON_DUPLICATE_REG_ID": True
+}
