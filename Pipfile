@@ -12,6 +12,8 @@ djangorestframework-simplejwt = "*"
 celery = "*"
 redis = "*"
 django-celery-beat = "*"
+django-push-notifications = "*"
+pillow = "*"
 
 [dev-packages]
 
