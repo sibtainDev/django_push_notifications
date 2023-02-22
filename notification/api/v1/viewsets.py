@@ -1,5 +1,6 @@
 import json
 
+from django.db.models import Q
 from django_celery_beat.models import ClockedSchedule, PeriodicTask
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -25,29 +26,29 @@ class ScheduleNotificationViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return self.queryset.filter(admin=self.request.user)
+        return self.queryset.filter(Q(receiver=self.request.user) | Q(receiver__isnull=True))
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
-        task_time = ClockedSchedule.objects.create(clocked_time=obj.activated_task_time)
-        name = obj.text
+        task_time = ClockedSchedule.objects.create(clocked_time=obj.schedule_notification_time)
+        name = obj.title
         if PeriodicTask.objects.filter(name=name).exists():
             # periodic_task name unique field so it will generate a random name if a name already exist
-            name = generate_random_name(obj.text)
+            name = generate_random_name(obj.title)
         period = PeriodicTask.objects.create(
             clocked=task_time,
             name=name,
             task='home.tasks.send_schedule_notification',
             one_off=True,
             kwargs=json.dumps({
-                'title': 'Notification',
-                'message': obj.text,
-                'sender': obj.admin.id,
+                'title': obj.title,
+                'message': obj.message,
+                'sender': obj.sender.id,
             })
         )
-        AdminPeriodTask.objects.create(notify=obj, period_task=period)
+        AdminPeriodTask.objects.create(notify=obj, period=period)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -59,25 +60,25 @@ class ScheduleNotificationViewSet(ModelViewSet):
         instance = self.get_object()
         task_ids = AdminPeriodTask.objects.filter(notify=instance)
         PeriodicTask.objects.filter(id__in=task_ids.values('period_task__id'),
-                                    clocked__clocked_time=instance.activated_task_time).delete()
+                                    clocked__clocked_time=instance.schedule_notification_time).delete()
         if task_ids.exists():
             task_ids.delete()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         obj = serializer.save()
-        name = obj.text
+        name = obj.title
         if PeriodicTask.objects.filter(name=name).exists():
-            name = generate_random_name(obj.text)
-        task_time = ClockedSchedule.objects.create(clocked_time=obj.activated_task_time)
+            name = generate_random_name(obj.title)
+        task_time = ClockedSchedule.objects.create(clocked_time=obj.schedule_notification_time)
         PeriodicTask.objects.create(
             clocked=task_time,
             name=name,
-            task='home.tasks.send_admin_notifications',
+            task='home.tasks.send_schedule_notification',
             one_off=True,
             kwargs=json.dumps({
-                'title': 'Notification',
-                'message': obj.text,
-                'sender': obj.admin.id,
+                'title': obj.title,
+                'message': obj.message,
+                'sender': obj.sender.id,
             })
         )
         return Response(serializer.data)
@@ -102,9 +103,9 @@ class LikePostViewSet(ModelViewSet):
             if post_query.exists():
                 post_query.delete()
                 return Response("UnLike", status=status.HTTP_200_OK)
-            LikePost.objects.create(user=user, post__id=post_id, is_like=True)
+            LikePost.objects.create(user=user, post_id=post_id, is_like=True)
             post = Post.objects.get(id=post_id)
             message = f"{user.username} liked your post"
-            add_notifications(title="Post Like", message=message, sender=user.id, receiver=post.created_by.id)
+            add_notifications(title="Post Like", message=message, sender=user, receiver=post.created_by)
             return Response("Liked", status=status.HTTP_200_OK)
         return Response("post_id required")

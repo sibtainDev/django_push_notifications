@@ -18,7 +18,7 @@ from environ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
-env.read_env('.env')
+# env.read_env('.env')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -140,7 +140,7 @@ CELERY_BROKER_URL = env.str("REDIS_URL", 'redis://localhost:6379')
 CELERY_RESULT_BACKEND = env.str("REDIS_URL", 'redis://localhost:6379')
 
 # push notification settings
-APNS_AUTH_KEY_PATH = BASE_DIR + '/' + 'push_notification' + env.str("AUTH_KEY_NAME", "")
+APNS_AUTH_KEY_PATH = str(BASE_DIR) + '/' + "push_notification" + env.str("AUTH_KEY_NAME", "")
 
 PUSH_NOTIFICATIONS_SETTINGS = {
     "FCM_API_KEY": env.str("FCM_SERVER_KEY", ""),
