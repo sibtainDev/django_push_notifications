@@ -10,11 +10,12 @@ from account.models import User
 class Notification(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender_notification", null=True,
                                blank=True)
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="send_notification", null=True,
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notification_receiver", null=True,
                                  blank=True)
     title = models.CharField(max_length=200)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
+    schedule_notification_time = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
