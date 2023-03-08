@@ -4,10 +4,11 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from account.api.v1.viewsets import UserRegistrationView, LoginTokenObtainView
+from account.api.v1.viewsets import UserRegistrationView, LoginTokenObtainView, AllUserDataView, UpdateUserView
 
 router = routers.SimpleRouter()
-
+router.register("all_user_data", AllUserDataView, basename="all_user_data")
+router.register("update_user", UpdateUserView, basename="update_user")
 
 urlpatterns = [
 

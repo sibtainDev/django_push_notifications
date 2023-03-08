@@ -14,6 +14,7 @@ redis = "*"
 django-celery-beat = "*"
 django-push-notifications = "*"
 pillow = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

@@ -53,11 +53,14 @@ INSTALLED_APPS = [
     'account',
     'notification',
     'push_notifications',
+    'corsheaders',
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -151,3 +154,5 @@ PUSH_NOTIFICATIONS_SETTINGS = {
     "APNS_USE_SANDBOX": env.bool("APNS_USE_SANDBOX", default=False),
     "UPDATE_ON_DUPLICATE_REG_ID": True
 }
+
+CORS_ALLOW_ALL_ORIGINS=True
